@@ -1,0 +1,8 @@
+# 跨平台图形库
+PyQt5==5.14.2
+PyQtWebEngine==5.14.0
+# xml，html解析库
+lxml==4.5.0
+# 浏览器
+chromedriver==2.24.1
+selenium==3.141.0
