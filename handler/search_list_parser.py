@@ -6,12 +6,6 @@
 from lxml import etree
 from models.SearchListModel import SearchListModel
 
-class SearchDetailParser(object):
-    def __init__(self, html):
-        super().__init__()
-        # 当前解析的html
-        self.html = html
-
 class SearchListParser(object):
     def __init__(self, html):
         super().__init__()
@@ -19,7 +13,7 @@ class SearchListParser(object):
         # 当前解析的html
         self.html = html
         # 解析成功标志
-        self.parse_successed = None
+        self.parse_successed = False
         # 当前页面
         self.current_page_index = 0
         # 下一页面
@@ -91,10 +85,14 @@ class SearchListParser(object):
         self.parse_successed = True
 
 if __name__ == "__main__":
-    import codecs
-    path = "./test.html"
-    with codecs.open(path, "r") as file:    
-        search = SearchListParser(file.read())
-        search.parse()
-        print(search.next_pagination_js)
-    
+    # import codecs
+    # path = "./test.html"
+    # with codecs.open(path, "r") as file:    
+    #     search = SearchListParser(file.read())
+    #     search.parse()
+    #     print(search.next_pagination_js)
+
+    test = [('Chang, C.-C.', 'https://www.scopus.com/authid/detail.uri?origin=resultslist&authorId=57191837691&zone='), ('Pan, H.', 'https://www.scopus.com/authid/detail.uri?origin=resultslist&authorId=57209409768&zone=')]
+    print("\r\n".join(
+                        map(lambda x:"(".join(x) + ")",test)
+                    ),)

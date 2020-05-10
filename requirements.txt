@@ -6,3 +6,5 @@ lxml==4.5.0
 # 浏览器
 chromedriver==2.24.1
 selenium==3.141.0
+# excel读写
+openpyxl==2.6.4

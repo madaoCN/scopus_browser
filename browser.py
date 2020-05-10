@@ -9,10 +9,13 @@ from PyQt5.QtGui import *
 from PyQt5.QtWebEngineWidgets import *
 
 from handler.search_list_parser import SearchListParser
+from handler.search_detail_parser import SearchDetailParser
 from renderDriver import RenderDriver
 import sys
 import re
 from collections import OrderedDict
+import queue
+import os 
 
 class MainWindow(QMainWindow):
 
@@ -108,22 +111,84 @@ class MainWindow(QMainWindow):
         
         # 加载下一页面
         if scrapy_next and parser.next_pagination_js and len(parser.next_pagination_js):
-            print(parser.next_pagination_js)
+            # 进入下一个页面
             self.browser.page().runJavaScript(parser.next_pagination_js)
 
-            # 测试代码
+            # self.parsing_pages_now = False
+            # # 爬取详情代码
+            # self.__craw_detail_page()
+        else:
+            # 没有要加载的页面
+            # self.parsing_pages_now = False
+            # print(self.search_result_page_dict)
+            # print("抓取成功：=========")
+            # print(len(self.search_result_page_dict))
             self.parsing_pages_now = False
             # 爬取详情代码
             self.__craw_detail_page()
-        else:
-        # 没有要加载的页面
-            self.parsing_pages_now = False
-            print(self.search_result_pages)
-            print("抓取成功：=========")
-            print(len(self.search_result_pages))
 
     def __craw_detail_page(self):
-        pass
+        '''
+        爬取详情页面
+        '''
+        for url, parser in self.search_result_page_dict.items():
+            # SearchListModel
+            for list_model in parser.search_list:
+                # 加载并解析
+                if list_model.title_link:
+                    result = RenderDriver.load_detail_page(list_model.title_link)
+                    ref_parser = SearchDetailParser(result)
+                    ref_parser.parse()
+                    # list Model
+                    list_model.ref_list = ref_parser.ref_list
+            #     break
+            # break
+        self.__save_2_file()
+
+    def __save_2_file(self):
+        file_name = "output.xlsx"
+        import urllib.parse
+        try:
+            parsed_tuple = urllib.parse.parse_qs(self.browser.url())
+            print(parsed_tuple)
+            file_name = parsed_tuple.get("searchterm1", "output") + ".xlsx"
+        except Exception as e:
+            pass
+        output_file_name, filetype = QFileDialog.getSaveFileName(self, 
+                                                                "保存结果", 
+                                                                os.path.join(os.path.expanduser("~"), "Downloads", file_name),
+                                                                "All Files (*);;Text Files (*.xlsx)")
+        if output_file_name == None or len(output_file_name) == 0: return
+
+        import openpyxl
+        work_book = openpyxl.Workbook()
+        sheet = work_book.active
+        # 域
+        fileds = ["标题", "标题链接", "作者", "年份", "期刊", "期刊链接", "引文"]
+        row = 1
+        # 写入域
+        for index in range(len(fileds)):
+            sheet.cell(row=row, column=index+1).value = fileds[index]
+
+        # 写入内容
+        for url, parser in self.search_result_page_dict.items():
+            for model in parser.search_list:
+                row += 1
+                items = [
+                    model.title,
+                    model.title_link,
+                    "\r\n".join(
+                       map(lambda x:"(".join(x) + ")", model.author)
+                    ),
+                    model.year,
+                    model.journal,
+                    model.journal_link,
+                ] 
+                items.extend(model.ref_list)
+                for index in range(len(items)):
+                    sheet.cell(row=row, column=index+1).value = items[index]
+
+        work_book.save(filename=output_file_name)
 
     def navigate_to_url(self):
         q = QUrl(self.urlbar.text())

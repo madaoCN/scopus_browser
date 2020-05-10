@@ -21,25 +21,28 @@ class RenderDriver(object):
     chrome_options.add_argument('--disable-gpu')
     # chrome_options.add_argument("user-data-dir=selenium") 
     browser = webdriver.Chrome(options=chrome_options)
-
+    # browser.close()
     wait = WebDriverWait(browser, 10)
-
+    
     def __init__(self):
         super().__init__()
 
     @classmethod
-    def load_pagination(cls, url, retry=3):
+    def load_detail_page(cls, url, retry=3):
         if retry == 0:return None
         try:
             cls.browser.get(url)
             cls.wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, '#referenceList')))
             html = cls.browser.page_source
-            
-            cls.browser.close()
+            # cls.browser.close()
             return html
         except TimeoutException as e:
-            load_pagination(url, retry=retry-1)
+            load_detail_page(url, retry=retry-1)
 
 if __name__ == "__main__":
     url = "https://www.scopus.com/record/display.uri?eid=2-s2.0-85084042488&origin=resultslist&sort=plf-f&src=s&st1=accounting&nlo=&nlr=&nls=&sid=5ecf55b57334be073e10359345e07f95&sot=b&sdt=b&sl=20&s=SRCTITLE%28accounting%29&relpos=0&citeCnt=0&searchTerm="
-    RenderDriver.load_pagination(url=url)
+    result = RenderDriver.load_detail_page(url=url)
+    from handler.search_detail_parser import SearchDetailParser
+    ref_parser = SearchDetailParser(result)
+    ref_parser.parse()
+    print(ref_parser.ref_list)
