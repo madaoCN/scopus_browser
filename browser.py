@@ -95,6 +95,10 @@ class MainWindow(QMainWindow):
         self.search_result_page_dict = OrderedDict()
 
     def parse_html(self, *args):
+        # 已经爬取过的return
+        if self.search_result_page_dict.has_key(self.browser.page().url()):
+            return
+
         self.init_result_dict()
         self.parsing_pages_now = True
         self.browser.page().toHtml(lambda x: self.__parser_html(x))
