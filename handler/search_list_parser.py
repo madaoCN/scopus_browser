@@ -85,7 +85,9 @@ class SearchListParser(object):
             if len(journal_group) > 1:
                 model.journal_no = "".join(journal_group[1:]).replace("\n", "")
 
-            model.journal_link = tr_list[3].find('.//a').get("href", "")
+            journal_link = tr_list[3].find('.//a')
+            if journal_link is not None:
+                model.journal_link = journal_link.get("href", "")
             
             self.search_list.append(model)
 
@@ -100,7 +102,3 @@ if __name__ == "__main__":
         search.parse()
         print(search.search_list)
 
-    # test = [('Chang, C.-C.', 'https://www.scopus.com/authid/detail.uri?origin=resultslist&authorId=57191837691&zone='), ('Pan, H.', 'https://www.scopus.com/authid/detail.uri?origin=resultslist&authorId=57209409768&zone=')]
-    # print("\r\n".join(
-    #                     map(lambda x:"(".join(x) + ")",test)
-    #                 ),)

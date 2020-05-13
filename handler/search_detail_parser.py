@@ -102,9 +102,11 @@ class SearchDetailParser(object):
 
                 # author 
                 if node.get("class", "") == "refAuthorTitle":
-                    author_liked = node.text.strip()
-                    if author_liked.endswith("."):
-                        ref_model.author = author_liked
+                    author_liked = node.text
+                    if author_liked:
+                        author_liked = author_liked.strip()
+                        if author_liked.endswith("."):
+                            ref_model.author = author_liked
 
                 # 年份
                 year_liked = None
@@ -135,8 +137,8 @@ class SearchDetailParser(object):
             # 引用model列表
             self.ref_model_list.append(ref_model)
 
-            print(ref_model.raw)
-            print(ref_model)
+            # print(ref_model.raw)
+            # print(ref_model)
 
         self.parse_successed = True
 
@@ -147,3 +149,4 @@ if __name__ == "__main__":
     with codecs.open(path, "r") as file:    
         search = SearchDetailParser(file.read())
         search.parse()
+        print(search.ref_model_list)

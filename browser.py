@@ -146,7 +146,7 @@ class MainWindow(QMainWindow):
                     # list Model
                     list_model.doi = ref_parser.doi
                     list_model.ref_list = ref_parser.ref_list
-                    list.model.ref_model_list = ref_parser.ref_model_list
+                    list_model.ref_model_list = ref_parser.ref_model_list
             #     break
             # break
         self.__save_2_file()
@@ -155,11 +155,11 @@ class MainWindow(QMainWindow):
         file_name = "output.xlsx"
         import urllib.parse
         try:
-            parsed_tuple = urllib.parse.parse_qs(self.browser.url())
-            print(parsed_tuple)
-            file_name = parsed_tuple.get("searchterm1", "output") + ".xlsx"
+            parsed_tuple = urllib.parse.parse_qs(self.browser.page().url().toDisplayString())
+            file_name = parsed_tuple.get("searchterm1", [""])[0] + ".xlsx"
         except Exception as e:
             pass
+
         output_file_name, filetype = QFileDialog.getSaveFileName(self, 
                                                                 "保存结果", 
                                                                 os.path.join(os.path.expanduser("~"), "Downloads", file_name),
@@ -168,7 +168,7 @@ class MainWindow(QMainWindow):
 
         import openpyxl
         work_book = openpyxl.Workbook()
-        sheet = work_book.create_sheet("源文章列表")
+        sheet = work_book.create_sheet("源文章列表", index=0)
         # 域
         fileds = ["DOI", "标题", "标题链接", "作者", "年份", "期刊", "期刊编号","期刊链接", "引文"]
         row = 1
@@ -197,9 +197,9 @@ class MainWindow(QMainWindow):
                     sheet.cell(row=row, column=index+1).value = items[index]
 
 
-        sheet = work_book.create_sheet("参考文献")
+        sheet = work_book.create_sheet("参考文献", index=1)
         # 域
-        fileds = ["原文章DOI", "原文章标题", "原文章年份", "引文DOI", "引文标题", "引文作者", "引文年份", "引文期刊", "引文期刊编号", "引文期刊链接", "引文其他"]
+        fileds = ["原文章DOI", "原文章标题", "原文章年份", "引文DOI", "引文标题", "引文作者", "引文年份", "引文期刊", "引文期刊编号", "引文引用链接", "引文期刊链接", "引文其他"]
         row = 1
         # 写入域
         for index in range(len(fileds)):
@@ -208,16 +208,13 @@ class MainWindow(QMainWindow):
         # 写入内容
         for url, parser in self.search_result_page_dict.items():
             for model in parser.search_list:
-                row += 1
-                items = [
-                    model.doi,
-                    model.title,
-                    model.year,
-                ] 
-                
                 for ref_model in model.ref_model_list:
                     row += 1
-                    items.extend([
+                    items = [
+                        model.doi,
+                        model.title,
+                        model.year,
+
                         ref_model.doi,
                         ref_model.title,
                         ref_model.author,
@@ -227,10 +224,10 @@ class MainWindow(QMainWindow):
                         ref_model.ref_link,
                         ref_model.title_link,
                         ref_model.raw
-                    ])
+                    ]
                     for index in range(len(items)):
                         sheet.cell(row=row, column=index+1).value = items[index]
-
+                row += 1
         work_book.save(filename=output_file_name)
 
 
