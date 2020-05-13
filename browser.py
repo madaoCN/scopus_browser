@@ -96,9 +96,9 @@ class MainWindow(QMainWindow):
 
     def parse_html(self, *args):
         # 已经爬取过的return
-        if self.search_result_page_dict.has_key(self.browser.page().url()):
-            return
-
+        # if self.search_result_page_dict[self.browser.page().url()]:
+        #     return
+    
         self.init_result_dict()
         self.parsing_pages_now = True
         self.browser.page().toHtml(lambda x: self.__parser_html(x))
@@ -144,6 +144,7 @@ class MainWindow(QMainWindow):
                     ref_parser = SearchDetailParser(result)
                     ref_parser.parse()
                     # list Model
+                    list_model.doi = ref_parser.doi
                     list_model.ref_list = ref_parser.ref_list
             #     break
             # break

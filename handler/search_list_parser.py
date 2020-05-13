@@ -76,7 +76,15 @@ class SearchListParser(object):
             model.year = "".join(tr_list[2].itertext()).strip()
 
             # 出版物
-            model.journal = "".join(tr_list[3].itertext()).strip().replace("\n", "\t")
+            journal_group = filter(
+                lambda x:len(x.strip("\r\n")),
+                list(tr_list[3].itertext())
+            )
+            journal_group = list(journal_group)
+            model.journal = journal_group[0]
+            if len(journal_group) > 1:
+                model.journal_no = "".join(journal_group[1:]).replace("\n", "")
+
             model.journal_link = tr_list[3].find('.//a').get("href", "")
             
             self.search_list.append(model)
@@ -85,14 +93,14 @@ class SearchListParser(object):
         self.parse_successed = True
 
 if __name__ == "__main__":
-    # import codecs
-    # path = "./test.html"
-    # with codecs.open(path, "r") as file:    
-    #     search = SearchListParser(file.read())
-    #     search.parse()
-    #     print(search.next_pagination_js)
+    import codecs
+    path = "./test.html"
+    with codecs.open(path, "r") as file:    
+        search = SearchListParser(file.read())
+        search.parse()
+        print(search.search_list)
 
-    test = [('Chang, C.-C.', 'https://www.scopus.com/authid/detail.uri?origin=resultslist&authorId=57191837691&zone='), ('Pan, H.', 'https://www.scopus.com/authid/detail.uri?origin=resultslist&authorId=57209409768&zone=')]
-    print("\r\n".join(
-                        map(lambda x:"(".join(x) + ")",test)
-                    ),)
+    # test = [('Chang, C.-C.', 'https://www.scopus.com/authid/detail.uri?origin=resultslist&authorId=57191837691&zone='), ('Pan, H.', 'https://www.scopus.com/authid/detail.uri?origin=resultslist&authorId=57209409768&zone=')]
+    # print("\r\n".join(
+    #                     map(lambda x:"(".join(x) + ")",test)
+    #                 ),)
