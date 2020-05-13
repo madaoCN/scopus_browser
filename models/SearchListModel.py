@@ -19,6 +19,7 @@ class SearchListModel(object):
         self.journal_link = None 
         
         self.ref_list = []
+        self.ref_model_list = []
 
     def __repr__(self):
         return ''' ========\r\n doi: {doi}\r\n title: {title}\r\n titlelink: {titlelink}\r\n author: {author}\r\n year: {year}\r\n journal: {journal}\r\n journal_no: {journal_no}\r\n journal_link: {journal_link}\r\n ========\r\n'''.format(

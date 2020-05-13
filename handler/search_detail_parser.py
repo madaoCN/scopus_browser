@@ -74,6 +74,9 @@ class SearchDetailParser(object):
                     ref_model.journal_page = href
                 # 查找文章地址
                 elif href and href.startswith("https://www.scopus.com/record/display.uri"):
+                    ref_model.title_link = href
+                # 引文地址
+                elif href and href.startswith("https://www.scopus.com/search/submit/citedby.uri"):
                     ref_model.ref_link = href
 
             for index in range(len(node_list)):
@@ -132,8 +135,8 @@ class SearchDetailParser(object):
             # 引用model列表
             self.ref_model_list.append(ref_model)
 
-            # print(ref_model.raw)
-            # print(ref_model)
+            print(ref_model.raw)
+            print(ref_model)
 
         self.parse_successed = True
 

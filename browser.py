@@ -146,6 +146,7 @@ class MainWindow(QMainWindow):
                     # list Model
                     list_model.doi = ref_parser.doi
                     list_model.ref_list = ref_parser.ref_list
+                    list.model.ref_model_list = ref_parser.ref_model_list
             #     break
             # break
         self.__save_2_file()
@@ -167,9 +168,9 @@ class MainWindow(QMainWindow):
 
         import openpyxl
         work_book = openpyxl.Workbook()
-        sheet = work_book.active
+        sheet = work_book.create_sheet("源文章列表")
         # 域
-        fileds = ["标题", "标题链接", "作者", "年份", "期刊", "期刊链接", "引文"]
+        fileds = ["DOI", "标题", "标题链接", "作者", "年份", "期刊", "期刊编号","期刊链接", "引文"]
         row = 1
         # 写入域
         for index in range(len(fileds)):
@@ -180,6 +181,7 @@ class MainWindow(QMainWindow):
             for model in parser.search_list:
                 row += 1
                 items = [
+                    model.doi,
                     model.title,
                     model.title_link,
                     "\r\n".join(
@@ -187,13 +189,50 @@ class MainWindow(QMainWindow):
                     ),
                     model.year,
                     model.journal,
+                    model.journal_no,
                     model.journal_link,
                 ] 
                 items.extend(model.ref_list)
                 for index in range(len(items)):
                     sheet.cell(row=row, column=index+1).value = items[index]
 
+
+        sheet = work_book.create_sheet("参考文献")
+        # 域
+        fileds = ["原文章DOI", "原文章标题", "原文章年份", "引文DOI", "引文标题", "引文作者", "引文年份", "引文期刊", "引文期刊编号", "引文期刊链接", "引文其他"]
+        row = 1
+        # 写入域
+        for index in range(len(fileds)):
+            sheet.cell(row=row, column=index+1).value = fileds[index]
+
+        # 写入内容
+        for url, parser in self.search_result_page_dict.items():
+            for model in parser.search_list:
+                row += 1
+                items = [
+                    model.doi,
+                    model.title,
+                    model.year,
+                ] 
+                
+                for ref_model in model.ref_model_list:
+                    row += 1
+                    items.extend([
+                        ref_model.doi,
+                        ref_model.title,
+                        ref_model.author,
+                        ref_model.year,
+                        ref_model.journal,
+                        ref_model.journal_page,
+                        ref_model.ref_link,
+                        ref_model.title_link,
+                        ref_model.raw
+                    ])
+                    for index in range(len(items)):
+                        sheet.cell(row=row, column=index+1).value = items[index]
+
         work_book.save(filename=output_file_name)
+
 
     def navigate_to_url(self):
         q = QUrl(self.urlbar.text())

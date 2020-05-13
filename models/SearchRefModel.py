@@ -10,6 +10,7 @@ class SearchRefModel(object):
         self.raw = None
         self.doi = None
         self.title = None
+        self.title_link = None 
         self.author = None
         self.year = None
         self.journal = None
@@ -17,9 +18,10 @@ class SearchRefModel(object):
         self.ref_link = None 
 
     def __repr__(self):
-        return ''' ========\r\n doi: {doi}\r\n title: {title}\r\n author: {author}\r\n year: {year}\r\n journal: {journal}\r\n journal_page: {journal_page}\r\n ref_link: {ref_link}\r\n ========\r\n'''.format(
+        return ''' ========\r\n doi: {doi}\r\n title: {title}\r\n title_link: {title_link}\r\n author: {author}\r\n year: {year}\r\n journal: {journal}\r\n journal_page: {journal_page}\r\n ref_link: {ref_link}\r\n ========\r\n'''.format(
                 doi = self.doi,
                 title = self.title,
+                title_link = self.title_link,
                 author = self.author,
                 year = self.year,
                 journal = self.journal,
