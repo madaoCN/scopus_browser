@@ -15,9 +15,10 @@ class SearchDetailParser(object):
     JOURNAL_PAGE_COMPILER = re.compile("[0-9].+?pp\..+?$")
 
     def __init__(self, html):
+
         super().__init__()
-        # 当前解析的html
-        self.html = re.sub("<!--.+?-->", "", html)
+        
+        self.html = None
         # doi
         self.doi = None
         self.ref_list = []
@@ -25,6 +26,12 @@ class SearchDetailParser(object):
         self.ref_model_list = []
         # 解析成功标志
         self.parse_successed = False
+        try:
+            # 当前解析的html
+            self.html = re.sub("<!--.+?-->", "", html)
+        except Exception as e:
+            print(e)
+
 
     def parse(self):
         if self.html == None:

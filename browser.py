@@ -140,17 +140,16 @@ class MainWindow(QMainWindow):
             for list_model in parser.search_list:
                 # 加载并解析
                 if list_model.title_link:
-                    result = RenderDriver.load_detail_page(list_model.title_link)
-                    ref_parser = SearchDetailParser(result)
-                    ref_parser.parse()
-                    # list Model
-                    list_model.doi = ref_parser.doi
-                    list_model.ref_list = ref_parser.ref_list
-                    list_model.ref_model_list = ref_parser.ref_model_list
-
-                    if list_model and list_model.doi.strip() == "10.2308/accr.2000.75.1.93":
-                        print(result)
-                        exit(0)
+                    try:
+                        result = RenderDriver.load_detail_page(list_model.title_link)
+                        ref_parser = SearchDetailParser(result)
+                        ref_parser.parse()
+                        # list Model
+                        list_model.doi = ref_parser.doi
+                        list_model.ref_list = ref_parser.ref_list
+                        list_model.ref_model_list = ref_parser.ref_model_list
+                    except Exception as e:
+                        print(e)
             #     break
             # break
         self.__save_2_file()
@@ -166,7 +165,7 @@ class MainWindow(QMainWindow):
 
         output_file_name, filetype = QFileDialog.getSaveFileName(self, 
                                                                 "保存结果", 
-                                                                os.path.join(os.path.expanduser("~"), "Downloads", file_name),
+                                                                os.path.join(os.path.expanduser("~"), "Desktop", file_name),
                                                                 "All Files (*);;Text Files (*.xlsx)")
         if output_file_name == None or len(output_file_name) == 0: return
 
@@ -183,23 +182,26 @@ class MainWindow(QMainWindow):
         # 写入内容
         for url, parser in self.search_result_page_dict.items():
             for model in parser.search_list:
-                row += 1
-                items = [
-                    model.doi,
-                    model.title,
-                    model.title_link,
-                    "\r\n".join(
-                       map(lambda x:"(".join(x) + ")", model.author)
-                    ),
-                    model.year,
-                    model.journal,
-                    model.journal_no,
-                    model.journal_link,
-                ] 
-                items.extend(model.ref_list)
+                try:
+                    row += 1
+                    items = [
+                        model.doi,
+                        model.title,
+                        model.title_link,
+                        "\r\n".join(
+                        map(lambda x:"(".join(x) + ")", model.author)
+                        ),
+                        model.year,
+                        model.journal,
+                        model.journal_no,
+                        model.journal_link,
+                    ] 
+                    items.extend(model.ref_list)
 
-                for index in range(len(items)):
-                    sheet.cell(row=row, column=index+1).value = items[index]
+                    for index in range(len(items)):
+                        sheet.cell(row=row, column=index+1).value = items[index]
+                except Exception as e:
+                    print(e)
 
 
         sheet = work_book.create_sheet("参考文献", index=1)
@@ -215,23 +217,26 @@ class MainWindow(QMainWindow):
             for model in parser.search_list:
                 for ref_model in model.ref_model_list:
                     row += 1
-                    items = [
-                        model.doi,
-                        model.title,
-                        model.year,
+                    try:
+                        items = [
+                            model.doi,
+                            model.title,
+                            model.year,
 
-                        ref_model.doi,
-                        ref_model.title,
-                        ref_model.author,
-                        ref_model.year,
-                        ref_model.journal,
-                        ref_model.journal_page,
-                        ref_model.ref_link,
-                        ref_model.title_link,
-                        ref_model.raw
-                    ]
-                    for index in range(len(items)):
-                        sheet.cell(row=row, column=index+1).value = items[index]
+                            ref_model.doi,
+                            ref_model.title,
+                            ref_model.author,
+                            ref_model.year,
+                            ref_model.journal,
+                            ref_model.journal_page,
+                            ref_model.ref_link,
+                            ref_model.title_link,
+                            ref_model.raw
+                        ]
+                        for index in range(len(items)):
+                            sheet.cell(row=row, column=index+1).value = items[index]
+                    except Exception as e:
+                        print(e)
                 # row += 1
         work_book.save(filename=output_file_name)
 
