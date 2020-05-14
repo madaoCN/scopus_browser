@@ -147,6 +147,10 @@ class MainWindow(QMainWindow):
                     list_model.doi = ref_parser.doi
                     list_model.ref_list = ref_parser.ref_list
                     list_model.ref_model_list = ref_parser.ref_model_list
+
+                    if list_model and list_model.doi.strip() == "10.2308/accr.2000.75.1.93":
+                        print(result)
+                        exit(0)
             #     break
             # break
         self.__save_2_file()
@@ -193,6 +197,7 @@ class MainWindow(QMainWindow):
                     model.journal_link,
                 ] 
                 items.extend(model.ref_list)
+
                 for index in range(len(items)):
                     sheet.cell(row=row, column=index+1).value = items[index]
 
@@ -227,7 +232,7 @@ class MainWindow(QMainWindow):
                     ]
                     for index in range(len(items)):
                         sheet.cell(row=row, column=index+1).value = items[index]
-                row += 1
+                # row += 1
         work_book.save(filename=output_file_name)
 
 
@@ -272,3 +277,5 @@ class MainWindow(QMainWindow):
 if __name__ == '__main__':
     url = 'https://www.scopus.com/search/form.uri?display=basic&zone=header&origin='
     MainWindow.run(url=url)
+    import os
+    os.system("pause")

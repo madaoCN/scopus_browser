@@ -37,12 +37,12 @@ class RenderDriver(object):
             # cls.browser.close()
             return html
         except TimeoutException as e:
-            load_detail_page(url, retry=retry-1)
+            cls.load_detail_page(url, retry=retry-1)
 
 if __name__ == "__main__":
-    url = "https://www.scopus.com/record/display.uri?eid=2-s2.0-85084042488&origin=resultslist&sort=plf-f&src=s&st1=accounting&nlo=&nlr=&nls=&sid=5ecf55b57334be073e10359345e07f95&sot=b&sdt=b&sl=20&s=SRCTITLE%28accounting%29&relpos=0&citeCnt=0&searchTerm="
+    url = "https://www.scopus.com/record/display.uri?eid=2-s2.0-0034423067&origin=resultslist&sort=plf-f&src=s&st1=Budgeting%3a+An+experimental+investigation+of+the+effects+of+negotiation&st2=&sid=95cff0480646c14dd7216f66bd360934&sot=b&sdt=b&sl=77&s=TITLE%28Budgeting%3a+An+experimental+investigation+of+the+effects+of+negotiation%29&relpos=0&citeCnt=74&searchTerm="
     result = RenderDriver.load_detail_page(url=url)
     from handler.search_detail_parser import SearchDetailParser
     ref_parser = SearchDetailParser(result)
     ref_parser.parse()
-    print(ref_parser.ref_list)
+    print(ref_parser.ref_model_list)

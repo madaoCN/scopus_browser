@@ -17,7 +17,7 @@ class SearchDetailParser(object):
     def __init__(self, html):
         super().__init__()
         # 当前解析的html
-        self.html = html
+        self.html = re.sub("<!--.+?-->", "", html)
         # doi
         self.doi = None
         self.ref_list = []
@@ -75,6 +75,7 @@ class SearchDetailParser(object):
                 # 查找文章地址
                 elif href and href.startswith("https://www.scopus.com/record/display.uri"):
                     ref_model.title_link = href
+                    ref_model.title = page_node.text
                 # 引文地址
                 elif href and href.startswith("https://www.scopus.com/search/submit/citedby.uri"):
                     ref_model.ref_link = href
@@ -100,6 +101,16 @@ class SearchDetailParser(object):
                 elif node.text and node.text.strip().startswith("doi"):
                     ref_model.doi = node.text.split("doi")[-1].strip(": ")
 
+                # 查找异常类型标题
+                if ref_model.title == None:
+                    title_liked_class_name = node.get("class")
+                    if title_liked_class_name and re.search("refAuthorTitle", title_liked_class_name):
+                        child_nodes = list(node.getchildren())
+                        if len(child_nodes) > 2 and \
+                            child_nodes[0].tag == "br" and \
+                            child_nodes[1].tag == "br":
+                            ref_model.title = child_nodes[0].tail
+                            
                 # author 
                 if node.get("class", "") == "refAuthorTitle":
                     author_liked = node.text
@@ -107,7 +118,7 @@ class SearchDetailParser(object):
                         author_liked = author_liked.strip()
                         if author_liked.endswith("."):
                             ref_model.author = author_liked
-
+                
                 # 年份
                 year_liked = None
                 if node_tail and self.YEAR_COMPILER.search(node_tail):
@@ -120,6 +131,15 @@ class SearchDetailParser(object):
                 # journal
                 if node.tag == "em":
                     ref_model.journal = node.text
+                    
+                    # 非规范标题
+                    # if ref_model.title == None:
+                    #     # print(list(node.itersiblings()))
+                    #     previous = node.getprevious()
+                    #     if previous is not None:
+                    #         previous = previous.getprevious()
+                    #         if previous is not None and previous.tag == "br":
+                    #             ref_model.title = previous.tail
 
                 # journal page
                 journal_page_liked = None
@@ -129,8 +149,7 @@ class SearchDetailParser(object):
                     journal_page_liked = node.text.strip()
                 if journal_page_liked:
                     ref_model.journal_page = journal_page_liked.lstrip(",， ").strip()
-
-
+                
             ref_model.raw = "\r\n".join(content_list)
             # 引用列表    
             self.ref_list.append("\r\n".join(content_list))
