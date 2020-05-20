@@ -17,18 +17,32 @@ class SearchListModel(object):
         self.journal = None
         self.journal_no = None
         self.journal_link = None 
+
+        # 参考文献数量
+        self.ref_count = 0
+        # 期刊信息
+        self.journal_info = None
+        # 摘要
+        self.abstract = None
+        # 作者关键字
+        self.author_keywords = None
+        # issn
+        self.issn = None
+        # 原始语言
+        self.raw_lang = None
+        # 来源出版物类型
+        self.src_journal_type = None
+        # 文献类型
+        self.document_type = None
+        # 出版商
+        self.publisher = None
         
         self.ref_list = []
         self.ref_model_list = []
 
     def __repr__(self):
-        return ''' ========\r\n doi: {doi}\r\n title: {title}\r\n titlelink: {titlelink}\r\n author: {author}\r\n year: {year}\r\n journal: {journal}\r\n journal_no: {journal_no}\r\n journal_link: {journal_link}\r\n ========\r\n'''.format(
-                doi = self.doi,
-                title = self.title,
-                titlelink = self.title_link,
-                author = self.author if self.author else [],
-                year = self.year,
-                journal = self.journal,
-                journal_no = self.journal_no,
-                journal_link = self.journal_link
-            )
+        var_str = " ========\r\n "
+        for name,value in vars(self).items():
+            var_str += "{key}: {value}\r\n".format(key=name, value=value)
+        var_str += " ========\r\n "
+        return var_str

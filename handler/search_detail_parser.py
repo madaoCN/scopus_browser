@@ -19,8 +19,27 @@ class SearchDetailParser(object):
         super().__init__()
         
         self.html = None
-        # doi
+        # 源文章doi
         self.doi = None
+        # 参考文献数量
+        self.ref_count = 0
+        # 期刊信息
+        self.journal_info = None
+        # 摘要
+        self.abstract = None
+        # 作者关键字
+        self.author_keywords = None
+        # issn
+        self.issn = None
+        # 原始语言
+        self.raw_lang = None
+        # 来源出版物类型
+        self.src_journal_type = None
+        # 文献类型
+        self.document_type = None
+        # 出版商
+        self.publisher = None
+
         self.ref_list = []
         # 引用列表
         self.ref_model_list = []
@@ -50,9 +69,60 @@ class SearchDetailParser(object):
         # doi 
         doi_node = root.xpath('''//*[@id="recordDOI"]''')
         if len(doi_node):
-            self.doi = doi_node[0].text
-        reference_lists = root.xpath('//table[@class="referenceLists table"]//tr/td')
+            self.doi = "".join(doi_node[0].itertext())
 
+        # 参考文献数量
+        ref_count_node = root.find('''.//*[@id="references"]''')
+        if ref_count_node is not None and ref_count_node.tail:
+            ref_count_search_rt = re.search("(\d+)", ref_count_node.tail)
+            if ref_count_search_rt:
+                self.ref_count = ref_count_search_rt.groups()[0]
+        
+        # 期刊信息
+        journal_info_node = root.find('''.//*[@id="journalInfo"]''')
+        if journal_info_node is not None:
+            self.journal_info = "".join(journal_info_node.itertext()).strip()
+
+        # 摘要 viewRefPH
+        abstract_node = root.find('''.//*[@id="abstractSection"]/p''')
+        if abstract_node is not None:
+            self.abstract = "".join(abstract_node.itertext()).strip()  
+
+        # 作者关键字
+        author_keywords_node_list = root.xpath('''.//*[@id="authorKeywords"]/span''')
+        if author_keywords_node_list is not None:
+            self.author_keywords = "\n".join(
+                map(lambda x:"".join(x.itertext()).strip(), author_keywords_node_list)
+            )
+
+        # citationInfo
+        citation_info_node = root.xpath('''.//*[@id="citationInfo"]/li/strong''')
+        if citation_info_node is not None:
+            for node in citation_info_node:
+                text = node.text
+                if text == None:continue
+                if text.startswith("ISSN"):
+                    self.issn = node.tail
+                elif text.startswith("来源出版物类型"):
+                    self.src_journal_type = node.tail
+                elif text.startswith("原始语言"):
+                    self.raw_lang = node.tail
+            # print(self.issn, self.src_journal_type, self.raw_lang)
+        # documentInfo
+        doc_info_node = root.xpath('''.//*[@id="documentInfo"]/li/strong''')
+        if doc_info_node is not None:
+            for node in doc_info_node:
+                text = node.text
+                if text == None:continue
+                # if text.startswith("DOI"):
+                #     self.doi = node.tail
+                if text.startswith("文献类型"):
+                    self.document_type = node.tail
+                elif text.startswith("出版商"):
+                    self.publisher = node.tail
+            # print(self.doi, self.document_type, self.publisher)
+
+        reference_lists = root.xpath('//table[@class="referenceLists table"]//tr/td')
         # 递归遍历子节点
         def walk_tree(root_node, content_list, level=0):
             if level > 2:return
@@ -175,4 +245,4 @@ if __name__ == "__main__":
     with codecs.open(path, "r") as file:    
         search = SearchDetailParser(file.read())
         search.parse()
-        print(search.ref_model_list)
+        # print(search.ref_model_list)

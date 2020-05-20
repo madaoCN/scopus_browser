@@ -148,6 +148,26 @@ class MainWindow(QMainWindow):
                         list_model.doi = ref_parser.doi
                         list_model.ref_list = ref_parser.ref_list
                         list_model.ref_model_list = ref_parser.ref_model_list
+                        
+                        # detail info 
+                        # 参考文献数量
+                        list_model.ref_count = ref_parser.ref_count
+                        # 期刊信息
+                        list_model.journal_info = ref_parser.journal_info
+                        # 摘要
+                        list_model.abstract = ref_parser.abstract
+                        # 作者关键字
+                        list_model.author_keywords = ref_parser.author_keywords
+                        # issn
+                        list_model.issn = ref_parser.issn
+                        # 原始语言
+                        list_model.raw_lang = ref_parser.raw_lang
+                        # 来源出版物类型
+                        list_model.src_journal_type = ref_parser.src_journal_type
+                        # 文献类型
+                        list_model.document_type = ref_parser.document_type
+                        # 出版商
+                        list_model.publisher = ref_parser.publisher
                     except Exception as e:
                         print(e)
             #     break
@@ -173,7 +193,9 @@ class MainWindow(QMainWindow):
         work_book = openpyxl.Workbook()
         sheet = work_book.create_sheet("源文章列表", index=0)
         # 域
-        fileds = ["DOI", "标题", "标题链接", "作者", "年份", "期刊", "期刊编号","期刊链接", "引文"]
+        fileds = ["DOI", "标题", "标题链接", "作者", "年份", "期刊", "期刊编号","期刊链接", 
+                    "参考文献数量", "期刊信息", "摘要", "作者关键字", "issn", "原始语言", "来源出版物类型", "文献类型", "出版商",
+                    "引文"]
         row = 1
         # 写入域
         for index in range(len(fileds)):
@@ -195,6 +217,26 @@ class MainWindow(QMainWindow):
                         model.journal,
                         model.journal_no,
                         model.journal_link,
+
+                        # 新增字段
+                        # 参考文献数量
+                        model.ref_count,
+                        # 期刊信息
+                        model.journal_info,
+                        # 摘要
+                        model.abstract,
+                        # 作者关键字
+                        model.author_keywords,
+                        # issn
+                        model.issn,
+                        # 原始语言
+                        model.raw_lang,
+                        # 来源出版物类型
+                        model.src_journal_type,
+                        # 文献类型
+                        model.document_type,
+                        # 出版商
+                        model.publisher,
                     ] 
                     items.extend(model.ref_list)
 
