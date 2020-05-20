@@ -40,6 +40,10 @@ class SearchDetailParser(object):
         # 出版商
         self.publisher = None
 
+        # 引文分页链接
+        self.ref_pagination_url = None
+
+
         self.ref_list = []
         # 引用列表
         self.ref_model_list = []
@@ -66,6 +70,12 @@ class SearchDetailParser(object):
 
         if root == None: return
 
+        # 引文分页链接
+        ref_pagination_url_node = root.find('''.//a[@id="referenceSrhResults"]''')
+        if ref_pagination_url_node:
+            self.ref_pagination_url = ref_pagination_url_node.get("href")
+            
+
         # doi 
         doi_node = root.xpath('''//*[@id="recordDOI"]''')
         if len(doi_node):
@@ -91,7 +101,7 @@ class SearchDetailParser(object):
         # 作者关键字
         author_keywords_node_list = root.xpath('''.//*[@id="authorKeywords"]/span''')
         if author_keywords_node_list is not None:
-            self.author_keywords = "\n".join(
+            self.author_keywords = ";\n".join(
                 map(lambda x:"".join(x.itertext()).strip(), author_keywords_node_list)
             )
 

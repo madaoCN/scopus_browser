@@ -62,7 +62,9 @@ class SearchListParser(object):
             model = SearchListModel()
             # 标题
             model.title = "".join(tr_list[0].itertext()).strip()
-            model.title_link = tr_list[0].xpath('./a/@href')[0]
+            hrefs = tr_list[0].xpath('./a/@href')
+            if hrefs and hrefs[0]:
+                model.title_link = hrefs[0]
 
             # 作者
             author = []
@@ -90,7 +92,8 @@ class SearchListParser(object):
                 model.journal_link = journal_link.get("href", "")
             
             self.search_list.append(model)
-
+            
+        print(self.search_list)
         # 解析完成
         self.parse_successed = True
 
