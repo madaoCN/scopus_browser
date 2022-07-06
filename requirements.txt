@@ -3,7 +3,7 @@ PyQt5==5.14.2
 PyQtWebEngine==5.14.0
 PyQt5-stubs==5.14.2.2
 # xml，html解析库
-lxml==4.5.0
+lxml==4.9.1
 # 浏览器
 chromedriver==2.24.1
 selenium==3.141.0
